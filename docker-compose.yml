@@ -1,0 +1,61 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres
+    container_name: postgres_db
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - postgres.env
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - postgres.env
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  botentry:
+    build: .
+    container_name: django_app
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    env_file:
+      - postgres.env
+    depends_on:
+      - db
+      - kafka
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
+    container_name: kafka_broker
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
