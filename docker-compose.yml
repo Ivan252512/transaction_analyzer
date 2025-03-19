@@ -22,7 +22,7 @@ services:
     depends_on:
       - db
 
-  botentry:
+  transaction_analyzer:
     build: .
     container_name: django_app
     volumes:

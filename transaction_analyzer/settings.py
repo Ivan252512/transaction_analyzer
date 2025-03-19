@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+KAFKA_BROKER_URL = os.getenv("KAFKA_BROKER_URL", "kafka:9092")
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "transaction_events")
 
 # Application definition
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'transactions'
 ]
 
 MIDDLEWARE = [
